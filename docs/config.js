@@ -3,7 +3,7 @@
    Letak URL Web App Apps Script di sini selepas deploy.
    Biarkan kosong untuk MOD DEMO (data dalam pelayar sahaja).
    ------------------------------------------------------------------ */
-var API_URL = '';
+var API_URL = 'https://script.google.com/macros/s/AKfycbyc_BpqHSQ0yiuj4jfEKc6NgqVuugMZjfrBEz9_js_CVBP78oze0WdVHsG7qiSNo8q6lA/exec';
 
 /* Tetapan paparan. Nilai sebenar diambil dari pelayan bila API_URL diisi. */
 var CFG = {
