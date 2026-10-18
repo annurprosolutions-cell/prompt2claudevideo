@@ -1,6 +1,6 @@
 # Netlify: deploy folder sistem-bantuan sebagai static site (tiada build step, tiada kos)
 [build]
-  publish = "sistem-bantuan"
+  publish = "docs"
   command = ""
 
 [[headers]]
