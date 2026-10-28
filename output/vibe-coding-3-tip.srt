@@ -1,0 +1,196 @@
+1
+00:00:00,190 --> 00:00:00,430
+Okey,
+
+2
+00:00:00,430 --> 00:00:01,310
+3 benda ni jangan
+
+3
+00:00:01,310 --> 00:00:02,919
+korang buat sewaktu
+
+4
+00:00:02,919 --> 00:00:03,960
+vibe coding lah.
+
+5
+00:00:03,960 --> 00:00:04,650
+Yang pertama ,
+
+6
+00:00:04,650 --> 00:00:06,009
+janganlah korang terus
+
+7
+00:00:06,009 --> 00:00:07,929
+suruh AI bina sistem
+
+8
+00:00:07,929 --> 00:00:08,810
+tanpa perancangan .
+
+9
+00:00:08,810 --> 00:00:10,029
+Masa ni korang kena
+
+10
+00:00:10,029 --> 00:00:11,449
+ada flow dia macam
+
+11
+00:00:11,449 --> 00:00:12,500
+mana instruction dan
+
+12
+00:00:12,500 --> 00:00:13,880
+sebagainya baru korang
+
+13
+00:00:13,880 --> 00:00:14,960
+suruh AI teruskan.
+
+14
+00:00:14,960 --> 00:00:16,699
+Jadi korang boleh
+
+15
+00:00:16,699 --> 00:00:18,260
+bincang dahulu dengan
+
+16
+00:00:18,260 --> 00:00:19,000
+AI tu dulu,
+
+17
+00:00:19,000 --> 00:00:20,089
+okey Yang kedua ,
+
+18
+00:00:20,089 --> 00:00:21,550
+jangan minta banyak
+
+19
+00:00:21,550 --> 00:00:22,500
+benda dalam satu prompt
+
+20
+00:00:22,500 --> 00:00:23,750
+lah Maksudnya,
+
+21
+00:00:24,059 --> 00:00:25,239
+macam-macam feature kita
+
+22
+00:00:25,239 --> 00:00:25,899
+minta ada,
+
+23
+00:00:25,899 --> 00:00:27,170
+tapi dalam satu mesej
+
+24
+00:00:27,170 --> 00:00:28,629
+prompt lah Jadi kita
+
+25
+00:00:28,629 --> 00:00:29,609
+kena buat berperingkat
+
+26
+00:00:29,609 --> 00:00:29,670
+.
+
+27
+00:00:29,670 --> 00:00:30,649
+Mula-mula kita nak
+
+28
+00:00:30,649 --> 00:00:31,859
+settlekan bahagian front
+
+29
+00:00:31,859 --> 00:00:33,570
+end dulu Pada bahagian
+
+30
+00:00:33,570 --> 00:00:35,390
+user experience dulu
+
+31
+00:00:35,390 --> 00:00:37,060
+dan sebagainya Baru
+
+32
+00:00:37,060 --> 00:00:38,090
+seterusnya,
+
+33
+00:00:38,090 --> 00:00:39,799
+dan seterusnya lah
+
+34
+00:00:39,799 --> 00:00:40,679
+Jadi berperingkat,
+
+35
+00:00:40,679 --> 00:00:41,509
+jangan semua letak
+
+36
+00:00:41,509 --> 00:00:42,420
+dalam satu prompt.
+
+37
+00:00:42,420 --> 00:00:43,070
+Okey,
+
+38
+00:00:43,070 --> 00:00:43,899
+yang ketiga adalah
+
+39
+00:00:43,899 --> 00:00:44,810
+jangan terus percaya
+
+40
+00:00:44,810 --> 00:00:45,939
+pada kod yang AI
+
+41
+00:00:45,939 --> 00:00:47,280
+bagi Maksudnya korang
+
+42
+00:00:47,280 --> 00:00:48,390
+kena cross-check dulu,
+
+43
+00:00:48,390 --> 00:00:49,359
+betul ke apa yang
+
+44
+00:00:49,359 --> 00:00:50,490
+dia bagi dan juga
+
+45
+00:00:50,490 --> 00:00:52,049
+boleh brainstorm dulu
+
+46
+00:00:52,049 --> 00:00:53,640
+dengan AI Jadi itulah
+
+47
+00:00:53,640 --> 00:00:55,549
+3 tip jangan buat
+
+48
+00:00:55,549 --> 00:00:58,039
+sewaktu vibe coding
+
+49
+00:00:58,039 --> 00:00:59,169
+Selamat mencuba
+
