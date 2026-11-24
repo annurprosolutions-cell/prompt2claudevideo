@@ -34,49 +34,7 @@ INKN = (18, 30, 60)
 NIGHT = (7, 16, 40)
 
 # (start, end, text) -- aligned to the pauses detected in the audio
-PH = [
-    (0.28, 2.09, "Assalamualaikum warahmatullahi wabarakatuh!"),
-    (2.92, 5.55, "Ramadan semakin dekat!"),
-    (6.54, 7.86, "Persoalannya..."),
-    (8.66, 9.34, "dah bersedia?"),
-    (9.88, 10.57, "Sebenarnya,"),
-    (11.43, 14.82, "kita tak perlu tunggu Ramadan untuk mula buat kebaikan."),
-    (15.46, 17.45, "Persediaan itu boleh bermula hari ini!"),
-    (18.30, 20.59, "Yang pertama, jaga solat lima waktu."),
-    (21.39, 24.40, "Usahakan solat di awal waktu dan perbaiki kekhusyukan."),
-    (25.16, 28.48, "Jadikan solat sebagai keutamaan, bukan sekadar rutin harian."),
-    (29.34, 31.56, "Yang kedua, biasakan membaca al-Quran."),
-    (32.40, 33.37, "Tak perlu terus banyak."),
-    (33.82, 37.11, "Walaupun hanya beberapa ayat sehari, yang penting kita istiqamah."),
-    (37.98, 39.99, "Biarlah sedikit, asalkan berterusan."),
-    (40.80, 41.41, "Yang ketiga,"),
-    (41.72, 43.21, "latih diri dengan puasa sunat."),
-    (44.21, 47.84, "Mulakan mengikut kemampuan, seperti puasa pada hari Isnin dan Khamis."),
-    (48.47, 54.06, "Dengan cara ini, kita dapat membiasakan diri dan menyediakan tubuh serta jiwa untuk berpuasa di bulan Ramadan."),
-    (54.91, 58.13, "Yang keempat, bersihkan hati dengan memperbanyakkan istighfar."),
-    (58.97, 62.07, "Mohon keampunan Allah atas segala dosa dan kesilapan."),
-    (62.90, 64.28, "Kurangkan perkara yang sia-sia."),
-    (64.67, 66.72, "Gantikan dengan perkara yang membawa manfaat."),
-    (67.49, 68.23, "Dan yang kelima,"),
-    (68.53, 71.12, "pilih satu amalan baik dan lakukan secara konsisten."),
-    (71.92, 75.52, "Jangan terlalu mengejar banyaknya amalan sehingga kita lupa untuk istiqamah."),
-    (76.31, 76.60, "Ingat!"),
-    (77.06, 79.53, "Perubahan yang besar bermula dengan langkah yang kecil."),
-    (80.35, 81.37, "Ramadan belum tiba..."),
-    (81.74, 84.72, "tetapi pahala kebaikan boleh kita usahakan mulai sekarang!"),
-    (85.48, 87.38, "Jangan tunggu esok untuk menjadi lebih baik."),
-    (87.94, 88.77, "Mulakan hari ini."),
-    (89.29, 91.09, "Perbaiki diri sedikit demi sedikit."),
-    (91.96, 96.96, "Semoga Allah memberikan kita kesempatan untuk bertemu Ramadan dan menjalaninya dengan penuh keimanan."),
-    (97.89, 98.83, "Ramadan belum tiba,"),
-    (99.20, 101.41, "tapi persediaan kita boleh bermula hari ini!"),
-]
-CAPTION_GROUPS = [[0], [1], [2, 3], [4], [5], [6], [7], [8], [9], [10], [11], [12], [13], [14, 15], [16], [17], [18], [19],
-                  [20], [21], [22, 23], [24], [25, 26], [27, 28], [29], [30], [31], [32], [33, 34]]
-CUTS = [17.87, 28.91, 40.40, 54.50, 67.10, 80.00]
-HIGHLIGHT = {"ramadan", "solat", "awal", "kekhusyukan", "alquran", "istiqamah", "puasa", "sunat", "isnin", "khamis",
-             "istighfar", "keampunan", "manfaat", "konsisten", "ingat", "kecil", "perubahan", "pahala", "esok",
-             "sekarang", "bersedia", "kebaikan", "persediaan", "keimanan", "mulakan", "sia-sia", "siasia", "kemampuan"}
+CUTS = [17.95, 28.75, 40.45, 54.45, 66.95, 79.90]  # mid-gaps right before each "Yang pertama/kedua/..."
 
 
 class OD:
@@ -96,27 +54,6 @@ class OD:
 def cr(x, a, b):
     return max(a, min(b, x))
 
-
-def norm(w):
-    return re.sub(r"[^\w]", "", w.lower())
-
-
-WORDS = []
-for si, (s, e, text) in enumerate(PH):
-    toks = text.split()
-    wts = [len(norm(x)) + 2 for x in toks]
-    tot, acc = sum(wts), 0
-    for tok, wg in zip(toks, wts):
-        ws = s + (e - s) * acc / tot
-        acc += wg
-        WORDS.append({"t": tok, "s": ws, "e": s + (e - s) * acc / tot, "seg": si})
-
-
-def gwt(seg, word):
-    for w in WORDS:
-        if w["seg"] == seg and norm(w["t"]).startswith(word):
-            return w["s"]
-    raise KeyError((seg, word))
 
 
 # ------------------------------------------------------------------ sprites
@@ -408,64 +345,98 @@ def header(fr, t, num, t_num, t_end, title, t_title, tsize, sub=None, t_sub=0, s
 
 
 # ------------------------------------------------------------------ scenes
+@lru_cache(maxsize=None)
+def mosque_big(w=640):
+    h = int(w * .72)
+    im = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    c1, c2 = (250, 240, 215), (222, 200, 150)
+    gy = h - 20
+    d.rectangle((w * .18, h * .55, w * .82, gy), fill=c1)
+    d.pieslice((w * .28, h * .12, w * .72, h * .98), 180, 360, fill=GOLD)
+    d.pieslice((w * .33, h * .17, w * .67, h * .93), 180, 360, fill=GOLD_L)
+    d.rectangle((w * .49, h * .02, w * .51, h * .14), fill=GOLD_D)
+    d.ellipse((w * .465, h * -.02, w * .535, h * .06), fill=GOLD)
+    for mx in (.1, .9):
+        x = w * mx
+        d.rectangle((x - w * .035, h * .3, x + w * .035, gy), fill=c2)
+        d.polygon([(x - w * .05, h * .3), (x + w * .05, h * .3), (x, h * .12)], fill=GOLD)
+        d.rectangle((x - 2, h * .04, x + 2, h * .13), fill=GOLD_D)
+        d.ellipse((x - 9, h * .0, x + 9, h * .06), fill=GOLD_L)
+    d.rounded_rectangle((w * .44, h * .62, w * .56, gy), radius=int(w * .06), fill=(10, 60, 80))
+    for x in (.24, .32, .68, .76):
+        d.rounded_rectangle((w * x - 12, h * .66, w * x + 12, h * .78), radius=12, fill=(255, 214, 110))
+    return bake_shadow(im, (0, 10), 26, 170, (255, 200, 90))
+
+
+def slot(fr, t, sp, t0, t1, y=1300, rot=0.0):
+    """One-at-a-time keyword card in the lower slot."""
+    card_in(fr, t, t0, t1, sp, W / 2, y, rot, (1000 if rot >= 0 else -1000, 0), .45, .2)
+
+
 def scene_hook(fr, t):
     E = CUTS[0] + .05
-    # A: greeting
-    show(fr, gb("ASSALAMUALAIKUM", 82), t, .28, 2.75, W / 2, 760)
-    show(fr, txt("WARAHMATULLAHI", 66), t, gwt(0, "warahmatullahi"), 2.75, W / 2, 880)
-    show(fr, txt("WABARAKATUH", 66), t, gwt(0, "wabarakatuh"), 2.75, W / 2, 970)
-    show(fr, crescent(320), t, .5, 2.75, W / 2, 1180, .6, 8)
-    # B: Ramadan semakin dekat
-    if 2.92 <= t < 6.3:
-        rays(fr, t, W / 2, 760, ease_out((t - 2.92) / .3), GOLD_L)
-    show(fr, crescent(300), t, 2.92, 6.3, W / 2, 520, .6, 10)
-    show(fr, gb("RAMADAN", 170), t, gwt(1, "ramadan"), 6.3, W / 2, 800, .5)
-    show(fr, pillg("SEMAKIN DEKAT!", 62), t, gwt(1, "semakin"), 6.3, W / 2, 1000, .45, -3)
-    confetti(fr, t, 2.95, W / 2, 800, 50, 2, 2.0)
-    # C: dah bersedia?
-    show(fr, txt("PERSOALANNYA...", 78), t, 6.54, 10.9, W / 2, 600, .4)
-    tb = 8.66
-    if tb <= t < 10.9:
-        shake = math.sin((t - tb) * 40) * 10 * (1 - clamp((t - tb) / .5))
-        show(fr, wb("DAH", 230), t, tb - .05, 10.9, W / 2 + shake, 820, .5)
-        show(fr, gb("BERSEDIA?", 150), t, tb + .02, 10.9, W / 2 + shake, 1030, .5)
-    show(fr, pillg("Sebenarnya...", 56, EMER, (255, 255, 255)), t, gwt(4, "sebenarnya"), 10.9, W / 2, 1230, .4, -2)
-    # D: no need to wait
-    show(fr, txt("TAK PERLU TUNGGU", 100), t, gwt(5, "tak"), E, W / 2, 640, .45)
-    show(fr, gb("RAMADAN", 190), t, gwt(5, "ramadan"), E, W / 2, 830 + math.sin(t * 3) * 7, .5)
-    show(fr, txt("UNTUK MULA BUAT KEBAIKAN", 58), t, gwt(5, "mula"), E, W / 2, 1010, .4)
-    tp = gwt(6, "persediaan")
-    if tp <= t < E:
-        rays(fr, t, W / 2, 1200, ease_out((t - tp) / .3), GOLD_L, 480)
-    show(fr, pillg("BERMULA HARI INI!", 74), t, gwt(6, "bermula"), E, W / 2, 1200, .5, -2)
-    confetti(fr, t, gwt(6, "hari"), W / 2, 1200, 60, 4, 2.2)
+    # title (spoken first in the audio)
+    show(fr, crescent(420), t, .2, 2.95, W / 2, 620, .7, 8)
+    show(fr, wb("BELUM", 130), t, 0.0, 2.95, W / 2, 830, .45)
+    show(fr, gb("RAMADAN", 190), t, .54, 2.95, W / 2, 1000, .5)
+    show(fr, pillg("TAPI BOLEH MULA!", 62), t, 1.26, 2.95, W / 2, 1200, .5, -3)
+    if 1.2 <= t < 2.95:
+        rays(fr, t, W / 2, 1000, ease_out((t - 1.2) / .4), GOLD_L, 520)
+    # salam
+    show(fr, gb("ASSALAMUALAIKUM", 82), t, 3.14, 5.95, W / 2, 800, .5)
+    show(fr, txt("WARAHMATULLAHI", 64), t, 3.90, 5.95, W / 2, 920, .45)
+    show(fr, txt("WABARAKATUH", 64), t, 4.66, 5.95, W / 2, 1010, .45)
+    show(fr, crescent(300), t, 3.3, 5.95, W / 2, 1230, .6, 8)
+    # Ramadan semakin dekat
+    if 6.56 <= t < 8.3:
+        rays(fr, t, W / 2, 760, ease_out((t - 6.56) / .3), GOLD_L)
+    show(fr, crescent(300), t, 6.56, 8.3, W / 2, 520, .6, 10)
+    show(fr, gb("RAMADAN", 170), t, 6.56, 8.3, W / 2, 800, .5)
+    show(fr, pillg("SEMAKIN DEKAT!", 62), t, 6.94, 8.3, W / 2, 1000, .45, -3)
+    confetti(fr, t, 7.44, W / 2, 800, 40, 2, 1.6)
+    # dah bersedia?
+    show(fr, txt("PERSOALANNYA...", 78), t, 8.58, 11.1, W / 2, 600, .4)
+    if 9.2 <= t < 11.1:
+        shake = math.sin((t - 10.02) * 40) * 10 * (1 - clamp((t - 10.02) / .5)) if t >= 10.02 else 0
+        show(fr, wb("DAH", 230), t, 9.2, 11.1, W / 2 + shake, 820, .5)
+        show(fr, gb("BERSEDIA?", 150), t, 10.02, 11.1, W / 2 + shake, 1030, .5)
+    # tak perlu tunggu Ramadan
+    show(fr, txt("TAK PERLU TUNGGU", 100), t, 12.26, E, W / 2, 640, .45)
+    show(fr, gb("RAMADAN", 190), t, 13.10, E, W / 2, 830 + math.sin(t * 3) * 7, .5)
+    show(fr, pillg("MULA BUAT KEBAIKAN", 52, EMER, (255, 255, 255), 44, 24), t, 13.82, E, W / 2, 1010, .45, -2)
+    # persediaan bermula hari ini
+    if 16.46 <= t < E:
+        rays(fr, t, W / 2, 1230, ease_out((t - 16.46) / .3), GOLD_L, 480)
+    show(fr, pillg("BERMULA HARI INI!", 74), t, 16.46, E, W / 2, 1230, .5, -2)
+    confetti(fr, t, 16.92, W / 2, 1230, 60, 4, 1.8)
 
 
 def scene_solat(fr, t):
     a, E = CUTS[0], CUTS[1] + .05
-    tt = gwt(7, "solat")
-    if a + .3 <= t < E:
-        rays(fr, t, W / 2, 640, ease_out((t - tt) / .5), GOLD_L, 560, 20, 12)
-    header(fr, t, "01", a + .15, E, "SOLAT", tt, 230, "LIMA WAKTU", gwt(7, "lima"))
-    card_in(fr, t, gwt(8, "awal"), E, item("Solat di awal waktu", GOLD_M, "clock"), W / 2, 1010, -1.5)
-    card_in(fr, t, gwt(8, "perbaiki"), E, item("Perbaiki kekhusyukan", EMER, "heart"), W / 2, 1160, 1.5, (-1000, 0))
-    tk = gwt(9, "keutamaan")
-    card_in(fr, t, gwt(9, "jadikan"), E, item("Solat sebagai keutamaan", (80, 110, 220), "star"), W / 2, 1310, -1.5)
-    ripple(fr, t, tk, W / 2 - 340, 1310)
+    if 19.66 <= t < E:
+        rays(fr, t, W / 2, 1010, ease_out((t - 19.66) / .5), GOLD_L, 600, 20, 12)
+    show(fr, gb("01", 120), t, 18.24, E, W / 2, 440, .5)
+    show(fr, gb("SOLAT", 230), t, 19.66, E, W / 2, 620 + math.sin(t * 2.6) * 6, .5)
+    show(fr, pillg("LIMA WAKTU", 46, EMER, (255, 255, 255), 44, 20), t, 19.98, E, W / 2, 790, .45, -2)
+    show(fr, mosque_big(), t, 19.98, E, W / 2, 1060 + math.sin(t * 2) * 8, .7)
+    slot(fr, t, item("Solat di awal waktu", GOLD_M, "clock"), 22.40, 23.62, 1400, -1.5)
+    slot(fr, t, item("Khusyuk", EMER, "heart"), 23.68, 26.0, 1400, 1.5)
+    slot(fr, t, item("Jadikan keutamaan", (80, 110, 220), "star"), 26.06, E, 1400, -1.5)
+    ripple(fr, t, 26.06, W / 2 - 340, 1400)
 
 
 def scene_quran(fr, t):
     a, E = CUTS[1], CUTS[2] + .05
-    tq = gwt(10, "biasakan")
-    header(fr, t, "02", a + .15, E, "AL-QURAN", tq, 170, "BACA SETIAP HARI", gwt(10, "membaca"))
-    tb = gwt(10, "membaca")
-    show(fr, quran(), t, tb, E, W / 2, 1020 + math.sin(t * 2) * 8, .6, math.sin(t * 1.4) * 2)
-    if tb <= t < E:
-        rays(fr, t, W / 2, 1000, ease_out((t - tb) / .5) * .8, GOLD_L, 440, 16, 10)
-    # 7-day dots fill while "beberapa ayat sehari" is spoken
-    t0, t1 = gwt(12, "walaupun"), gwt(12, "istiqamah")
+    show(fr, gb("02", 120), t, 29.12, E, W / 2, 440, .5)
+    show(fr, gb("AL-QURAN", 170), t, 30.98, E, W / 2, 620 + math.sin(t * 2.6) * 6, .5)
+    show(fr, pillg("BACA SETIAP HARI", 46, EMER, (255, 255, 255), 44, 20), t, 30.60, E, W / 2, 790, .45, -2)
+    show(fr, quran(), t, 30.60, E, W / 2, 1020 + math.sin(t * 2) * 8, .6, math.sin(t * 1.4) * 2)
+    if 30.6 <= t < E:
+        rays(fr, t, W / 2, 1000, ease_out((t - 30.6) / .5) * .8, GOLD_L, 440, 16, 10)
+    t0, t1 = 34.34, 36.30
     if t >= t0 - .1:
-        n = clamp((t - t0) / (t1 - t0 + .2)) * 7
+        n = clamp((t - t0) / (t1 - t0)) * 7
         d = OD(fr)
         for i in range(7):
             x = W / 2 - 270 + i * 90
@@ -477,17 +448,19 @@ def scene_quran(fr, t):
                 d.ellipse((x - rr, 1290 - rr, x + rr, 1290 + rr), fill=GOLD + (255,))
         d.done()
         if n >= 7:
-            ripple(fr, t, t1 + .2, W / 2, 1290, GOLD_L, 220)
-    tl = gwt(13, "biarlah")
-    show(fr, pillg("SEDIKIT, ASALKAN BERTERUSAN", 44, GOLD, padx=40, pady=24), t, tl, E, W / 2, 1375, .45, -2)
+            ripple(fr, t, t1 + .1, W / 2, 1290, GOLD_L, 220)
+    show(fr, txt("beberapa ayat sehari", 54, GOLD_L, XBOLD), t, 34.34, 36.2, W / 2, 1400, .4)
+    show(fr, pillg("ISTIQAMAH", 56, GOLD), t, 36.30, 37.6, W / 2, 1400, .45, -2)
+    show(fr, pillg("SEDIKIT, ASALKAN BERTERUSAN", 44, GOLD, padx=40, pady=24), t, 37.72, E, W / 2, 1400, .45, -2)
 
 
 def scene_puasa(fr, t):
     a, E = CUTS[2], CUTS[3] + .05
-    tt = gwt(15, "latih") if False else gwt(14, "ketiga")
-    header(fr, t, "03", a + .15, E, "PUASA SUNAT", tt + .05, 125, "IKUT KEMAMPUAN", gwt(15, "puasa"))
+    show(fr, gb("03", 120), t, 40.94, E, W / 2, 440, .5)
+    show(fr, gb("PUASA SUNAT", 125), t, 42.54, E, W / 2, 620 + math.sin(t * 2.6) * 6, .5)
+    show(fr, pillg("IKUT KEMAMPUAN", 46, EMER, (255, 255, 255), 44, 20), t, 44.98, E, W / 2, 790, .45, -2)
     days = ["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Aha"]
-    tc, ti, tk = gwt(16, "mulakan"), gwt(16, "isnin"), gwt(16, "khamis")
+    tc, ti, tk = 44.12, 46.74, 47.26
     d = OD(fr)
     for i, dn in enumerate(days):
         t0 = tc + i * .08
@@ -507,50 +480,49 @@ def scene_puasa(fr, t):
     d.done()
     ripple(fr, t, ti, W / 2 - 456 + 59, 1020)
     ripple(fr, t, tk, W / 2 - 456 + 3 * 132 + 59, 1020)
-    card_in(fr, t, gwt(17, "membiasakan"), E, item("Biasakan diri", EMER, "moon"), W / 2, 1230, -1.5)
-    card_in(fr, t, gwt(17, "menyediakan"), E, item("Sedia tubuh & jiwa", GOLD_M, "heart"), W / 2, 1360, 1.5, (-1000, 0))
-    tr = gwt(17, "ramadan")
-    confetti(fr, t, tr, W / 2, 1100, 40, 8, 1.8)
+    show(fr, item("Biasakan diri", EMER, "moon"), t, 49.64, E, W / 2, 1230, .45, -1.5)
+    show(fr, item("Sedia tubuh & jiwa", GOLD_M, "heart"), t, 50.90, E, W / 2, 1360, .45, 1.5)
+    show(fr, gb("RAMADAN", 110), t, 53.66, E, W / 2, 1500, .5)
+    confetti(fr, t, 53.66, W / 2, 1400, 40, 8, 1.8)
 
 
 def scene_istighfar(fr, t):
     a, E = CUTS[3], CUTS[4] + .05
-    header(fr, t, "04", a + .15, E, "ISTIGHFAR", gwt(18, "keempat") + .1, 140, "BERSIHKAN HATI", gwt(18, "bersihkan"))
-    th = gwt(18, "memperbanyakkan")
-    pulse = 1 + .05 * math.sin(t * 5)
-    show(fr, heart(300), t, th, E, W / 2, 1010, .6, 0)
-    if t >= th:
+    show(fr, gb("04", 120), t, 55.10, E, W / 2, 440, .5)
+    show(fr, pillg("BERSIHKAN HATI", 46, EMER, (255, 255, 255), 44, 20), t, 55.82, E, W / 2, 790, .45, -2)
+    show(fr, heart(300), t, 56.34, E, W / 2, 1010, .6, 0)
+    show(fr, gb("ISTIGHFAR", 140), t, 57.46, E, W / 2, 620 + math.sin(t * 2.6) * 6, .5)
+    if t >= 56.5:
         for k in range(3):
-            ripple(fr, t, th + .3 + k * 1.2 + ((t - th) // 3.6) * 3.6 * 0, W / 2, 1010, (255, 160, 185), 260)
-    # "Astaghfirullah" floats up from the heart while asking for forgiveness
-    tm = gwt(19, "mohon")
-    if tm <= t < E:
+            ripple(fr, t, 56.8 + k * 1.2, W / 2, 1010, (255, 160, 185), 260)
+    if 58.44 <= t < E:
         for k in range(4):
-            p = ((t - tm - k * .55) % 2.4) / 2.4
-            if t < tm + k * .55:
+            if t < 58.44 + k * .55:
                 continue
+            p = ((t - 58.44 - k * .55) % 2.4) / 2.4
             x = W / 2 + (-230 + k * 150) + math.sin(p * 6 + k) * 40
             y = 1100 - p * 200
             put2(fr, txt("Astaghfirullah", 40, GOLD_L, SEMI), x, y, 1, math.sin(math.pi * clamp(p)) ** .6 * .95, 0)
-    card_in(fr, t, gwt(20, "kurangkan"), E, item("Kurangkan yang sia-sia", ROSE, "x"), W / 2, 1250, -1.5)
-    card_in(fr, t, gwt(21, "gantikan"), E, item("Ganti dengan manfaat", EMER, "check"), W / 2, 1385, 1.5, (-1000, 0))
+    show(fr, pillg("KEAMPUNAN", 52, GOLD), t, 59.42, 62.4, W / 2, 1300, .45, -2)
+    show(fr, item("Kurangkan yang sia-sia", ROSE, "x"), t, 62.72, E, W / 2, 1250, .45, -1.5)
+    show(fr, item("Ganti dengan manfaat", EMER, "check"), t, 64.58, E, W / 2, 1385, .45, 1.5)
 
 
 def scene_istiqamah(fr, t):
     a, E = CUTS[4], CUTS[5] + .05
-    header(fr, t, "05", a + .15, E, "ISTIQAMAH", gwt(22, "kelima") + .1, 140, "SATU AMALAN BAIK", gwt(23, "pilih"))
-    tk = 76.2
-    card_in(fr, t, gwt(24, "jangan"), tk, item("Bukan banyaknya amalan", ROSE, "x"), W / 2, 1010, -1.5)
-    card_in(fr, t, gwt(24, "istiqamah"), tk, item("Tapi konsisten", EMER, "check"), W / 2, 1160, 1.5, (-1000, 0))
-    # INGAT!
-    ti = PH[25][0]
-    if ti <= t < 77.4:
+    show(fr, gb("05", 120), t, 67.64, E, W / 2, 440, .5)
+    show(fr, gb("ISTIQAMAH", 140), t, 68.54, E, W / 2, 620 + math.sin(t * 2.6) * 6, .5)
+    show(fr, pillg("SATU AMALAN BAIK", 46, EMER, (255, 255, 255), 44, 20), t, 68.84, E, W / 2, 790, .45, -2)
+    show(fr, item("Konsisten", EMER, "check"), t, 70.62, 72.5, W / 2, 1100, .45, 1.5)
+    show(fr, item("Bukan banyaknya amalan", ROSE, "x"), t, 72.96, 74.8, W / 2, 1100, .45, -1.5)
+    show(fr, item("Tapi istiqamah", EMER, "check"), t, 74.90, 76.0, W / 2, 1100, .45, 1.5)
+    ti = 76.12
+    if ti <= t < 77.0:
         rays(fr, t, W / 2, 1000, ease_out((t - ti) / .2), GOLD_L, 700, 22, 40)
-    show(fr, gb("INGAT!", 210), t, ti, 77.4, W / 2, 1000, .35, -3, .2)
-    ts = gwt(26, "perubahan")
+    show(fr, gb("INGAT!", 210), t, ti, 77.0, W / 2, 1000, .35, -3, .2)
+    ts = 77.44
     if t >= ts:
-        # little steps -> big change: five stairs rise, a star climbs them
-        d = ImageDraw.Draw(fr, "RGBA")
+        d = OD(fr)
         for i in range(5):
             t0 = ts + i * .42
             if t < t0:
@@ -558,75 +530,54 @@ def scene_istiqamah(fr, t):
             p = ease_out_back((t - t0) / .35)
             hh = (70 + i * 62) * cr(p, 0, 1.1)
             x0 = W / 2 - 400 + i * 160
-            d.rounded_rectangle((x0, 1380 - hh, x0 + 150, 1380), radius=18, fill=GOLD_L + (255,) if i == 4 else GOLD + (255,),
+            d.rounded_rectangle((x0, 1480 - hh, x0 + 150, 1480), radius=18, fill=GOLD_L + (255,) if i == 4 else GOLD + (255,),
                                 outline=GOLD_D + (255,), width=4)
+        d.done()
         k = clamp((t - ts) / 2.2) * 4
         i0 = min(int(k), 3)
         f = k - i0
         hop = abs(math.sin(f * math.pi)) * 90
-        sx = W / 2 - 400 + (i0 + f) * 160 + 75
-        sy = 1380 - (70 + (i0 + f) * 62) - 60 - hop
-        put2(fr, star5(110), sx, sy, 1, 1, t * 80)
-        show(fr, txt("LANGKAH KECIL", 56), t, ts + .2, E, W / 2, 880, .4, -3)
-        show(fr, gb("PERUBAHAN BESAR", 70), t, ts + 1.4, E, W / 2, 975, .45, -2)
+        put2(fr, star5(110), W / 2 - 400 + (i0 + f) * 160 + 75, 1480 - (70 + (i0 + f) * 62) - 60 - hop, 1, 1, t * 80)
+    show(fr, gb("PERUBAHAN BESAR", 70), t, 77.04, E, W / 2, 900, .45, -2)
+    show(fr, txt("LANGKAH KECIL", 60), t, 78.72, E, W / 2, 1010, .4, -3)
 
 
 def scene_close(fr, t):
-    a = CUTS[5]
-    sky_boost = clamp((t - a) / 1.0)
-    # A: Ramadan belum tiba...
-    show(fr, crescent(380), t, 80.2, 85.4, W / 2, 620, .7, 8)
-    show(fr, txt("RAMADAN", 92), t, gwt(27, "ramadan"), 81.6, W / 2, 940, .45)
-    show(fr, txt("BELUM TIBA...", 92), t, gwt(27, "belum"), 81.6, W / 2, 1050, .45)
-    tp = gwt(28, "pahala")
-    if tp <= t < 85.4:
-        rays(fr, t, W / 2, 1000, ease_out((t - tp) / .3), GOLD_L, 560)
-    show(fr, gb("PAHALA", 190), t, tp, 85.4, W / 2, 950, .5)
-    show(fr, pillg("BOLEH BERMULA SEKARANG", 48, GOLD, padx=44, pady=24), t, gwt(28, "usahakan"), 85.4, W / 2, 1150, .45, -2)
-    confetti(fr, t, gwt(28, "usahakan"), W / 2, 1000, 50, 12, 2.2)
-    # B: jangan tunggu esok
-    te = gwt(29, "jangan")
-    show(fr, wb("JANGAN", 150), t, te, 88.7, W / 2, 740, .45)
-    show(fr, wb("TUNGGU", 150), t, gwt(29, "tunggu"), 88.7, W / 2, 890, .45)
-    tsk = gwt(29, "esok")
-    if tsk <= t < 88.7:
-        show(fr, item("ESOK", ROSE, "x", 520, 130), t, tsk, 88.7, W / 2, 1090, .45, -2)
-    show(fr, txt("untuk menjadi lebih baik", 56, GOLD_L, XBOLD), t, gwt(29, "menjadi"), 88.7, W / 2, 1250, .4)
-    # C: mulakan hari ini + progress bar
-    tm = PH[30][0]
-    if tm <= t < 91.7:
-        rays(fr, t, W / 2, 800, ease_out((t - tm) / .3), GOLD_L, 620, 20, 30)
-    sc = 1 + .04 * math.sin((t - tm) * 7)
-    show(fr, pillg("MULAKAN HARI INI", 84, GOLD, padx=64, pady=40), t, tm, 91.75, W / 2, 800, .45, -2)
-    tb0, tb1 = PH[31][0], PH[31][1]
-    if tb0 <= t < 91.75:
-        p = ease_out(clamp((t - tb0 + .05) / (tb1 - tb0 + .2)))
+    show(fr, crescent(380), t, 80.2, 85.3, W / 2, 620, .7, 8)
+    show(fr, txt("RAMADAN", 92), t, 80.20, 81.9, W / 2, 940, .45)
+    show(fr, txt("BELUM TIBA...", 92), t, 80.74, 81.9, W / 2, 1050, .45)
+    if 82.04 <= t < 85.3:
+        rays(fr, t, W / 2, 1000, ease_out((t - 82.04) / .3), GOLD_L, 560)
+    show(fr, gb("PAHALA", 190), t, 82.04, 85.3, W / 2, 950, .5)
+    show(fr, pillg("BOLEH MULA SEKARANG", 48, GOLD, padx=44, pady=24), t, 83.92, 85.3, W / 2, 1150, .45, -2)
+    confetti(fr, t, 83.92, W / 2, 1000, 50, 12, 1.8)
+    show(fr, wb("JANGAN", 150), t, 85.34, 87.2, W / 2, 740, .45)
+    show(fr, wb("TUNGGU", 150), t, 85.78, 87.2, W / 2, 890, .45)
+    show(fr, item("ESOK", ROSE, "x", 520, 130), t, 86.04, 87.2, W / 2, 1090, .45, -2)
+    if 87.34 <= t < 91.55:
+        rays(fr, t, W / 2, 800, ease_out((t - 87.34) / .3), GOLD_L, 620, 20, 30)
+    show(fr, pillg("MULAKAN HARI INI", 84, GOLD, padx=64, pady=40), t, 87.34, 91.55, W / 2, 800, .45, -2)
+    if 89.14 <= t < 91.55:
+        p = ease_out(clamp((t - 89.14) / (90.9 - 89.14)))
         d = OD(fr)
         d.rounded_rectangle((W / 2 - 400, 1040, W / 2 + 400, 1096), radius=28, fill=(255, 255, 255, 50), outline=(255, 255, 255, 120), width=3)
         d.rounded_rectangle((W / 2 - 400, 1040, W / 2 - 400 + 800 * p, 1096), radius=28, fill=GOLD + (255,))
         d.text((W / 2, 1150), "sedikit demi sedikit", font=font(XBOLD, 52), fill=GOLD_L, anchor="mm")
         d.done()
-    # E: semoga Allah ... bertemu Ramadan
-    t92 = PH[32][0]
-    if t92 <= t < 97.6:
+    if 91.64 <= t < 97.3:
         for k, (x, y, w2, h2) in enumerate([(150, 1000, 130, 240), (930, 1040, 130, 240)]):
-            show(fr, lantern(w2, h2), t, t92 + k * .3, 97.6, x, y + math.sin(t * 2 + k) * 14, .6, math.sin(t * 1.6 + k) * 5)
-    show(fr, txt("SEMOGA ALLAH", 86), t, t92 + .1, 97.6, W / 2, 700, .5)
-    show(fr, txt("SAMPAIKAN KITA", 86), t, gwt(32, "memberikan"), 97.6, W / 2, 810, .5)
-    show(fr, txt("KE", 70, GOLD_L), t, gwt(32, "bertemu"), 97.6, W / 2, 920, .4)
-    show(fr, gb("RAMADAN", 190), t, gwt(32, "ramadan"), 97.6, W / 2, 1090 + math.sin(t * 2.5) * 7, .55)
-    show(fr, crescent(160), t, gwt(32, "menjalaninya"), 97.6, W / 2, 440, .5, 8)
-    # F: finale
-    t33 = PH[33][0]
-    show(fr, txt("RAMADAN BELUM TIBA,", 72), t, t33, 101.9, W / 2, 640, .45)
-    show(fr, gb("TAPI", 110), t, PH[34][0] - .05, 101.9, W / 2 - 250, 800, .4)
-    show(fr, gb("PERSEDIAAN KITA", 100), t, gwt(34, "persediaan"), 101.9, W / 2, 930, .5)
-    th = gwt(34, "bermula")
-    if th <= t:
-        rays(fr, t, W / 2, 1180, ease_out((t - th) / .3), GOLD_L, 620, 20, 30)
-    show(fr, pillg("BOLEH BERMULA HARI INI!", 56, GOLD, padx=48, pady=30), t, th, 101.9, W / 2, 1180, .5, -2)
-    confetti(fr, t, gwt(34, "hari"), W / 2, 1180, 90, 21, 3.5)
-
+            show(fr, lantern(w2, h2), t, 91.64 + k * .3, 97.3, x, y + math.sin(t * 2 + k) * 14, .6, math.sin(t * 1.6 + k) * 5)
+    show(fr, txt("SEMOGA ALLAH", 86), t, 91.64, 97.3, W / 2, 700, .5)
+    show(fr, txt("SAMPAIKAN KITA", 86), t, 92.42, 97.3, W / 2, 810, .5)
+    show(fr, txt("KE", 70, GOLD_L), t, 93.92, 97.3, W / 2, 920, .4)
+    show(fr, gb("RAMADAN", 190), t, 94.32, 97.3, W / 2, 1090 + math.sin(t * 2.5) * 7, .55)
+    show(fr, crescent(160), t, 95.10, 97.3, W / 2, 440, .5, 8)
+    show(fr, txt("RAMADAN BELUM TIBA,", 72), t, 97.42, 101.9, W / 2, 640, .45)
+    show(fr, gb("TAPI PERSEDIAAN KITA", 90), t, 99.18, 101.9, W / 2, 860, .5)
+    if t >= 100.32:
+        rays(fr, t, W / 2, 1180, ease_out((t - 100.32) / .3), GOLD_L, 620, 20, 30)
+    show(fr, pillg("BOLEH BERMULA HARI INI!", 56, GOLD, padx=48, pady=30), t, 100.32, 101.9, W / 2, 1180, .5, -2)
+    confetti(fr, t, 100.70, W / 2, 1180, 90, 21, 3.5)
 
 SCENES = [(0, scene_hook), (CUTS[0], scene_solat), (CUTS[1], scene_quran), (CUTS[2], scene_puasa),
           (CUTS[3], scene_istighfar), (CUTS[4], scene_istiqamah), (CUTS[5], scene_close)]
@@ -681,60 +632,6 @@ def chrome(fr, t, total):
             d.rounded_rectangle((x - w / 2, 250, x + w / 2, 262), radius=6, fill=col)
 
 
-@lru_cache(maxsize=None)
-def layout(gi):
-    f = font(XBOLD, 56)
-    sp = f.getlength(" ")
-    words = [w for w in WORDS if w["seg"] in CAPTION_GROUPS[gi]]
-    lines, cur, cw = [], [], 0
-    for w in words:
-        ww = f.getlength(w["t"])
-        if cur and cw + sp + ww > 940:
-            lines.append((cur, cw))
-            cur, cw = [], 0
-        cw += (sp if cur else 0) + ww
-        cur.append((w, ww))
-    if cur:
-        lines.append((cur, cw))
-    return lines
-
-
-def caption(fr, t):
-    gi = None
-    for i, g in enumerate(CAPTION_GROUPS):
-        start = PH[g[0]][0] - .1
-        end = PH[CAPTION_GROUPS[i + 1][0]][0] - .12 if i + 1 < len(CAPTION_GROUPS) else 99
-        end = min([end] + [c for c in CUTS if start < c < end])
-        if start <= t < end:
-            gi = i
-    if gi is None:
-        return
-    f = font(XBOLD, 56)
-    sp = f.getlength(" ")
-    lines = layout(gi)
-    lh = 80
-    y0 = 1580 - (len(lines) - 1) * lh / 2
-    app = ease_out((t - (PH[CAPTION_GROUPS[gi][0]][0] - .1)) / .2)
-    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    d = ImageDraw.Draw(layer)
-    for li, (ws, lw) in enumerate(lines):
-        x = W / 2 - lw / 2
-        y = y0 + li * lh + (1 - app) * 30
-        for w, ww in ws:
-            spoken = t >= w["s"]
-            if norm(w["t"]) in HIGHLIGHT and spoken:
-                k = ease_out_back((t - w["s"]) / .25)
-                pad = 11 * k
-                d.rounded_rectangle((x - pad, y - 40 - pad * .4, x + ww + pad, y + 36 + pad * .4), radius=16, fill=GOLD)
-                d.text((x, y), w["t"], font=f, fill=INKN, anchor="lm")
-            else:
-                d.text((x, y), w["t"], font=f, fill=CREAMT + ((255,) if spoken else (100,)), anchor="lm",
-                       stroke_width=5, stroke_fill=NIGHT + (230 if spoken else 90,))
-            x += ww + sp
-    if app < 1:
-        layer.putalpha(layer.getchannel("A").point(lambda v: int(v * app)))
-    fr.alpha_composite(layer)
-
 
 def render_frame(t, total=101.8):
     bg = background()
@@ -746,7 +643,6 @@ def render_frame(t, total=101.8):
     [fn for start, fn in SCENES if t >= start][-1](fr, t)
     transition(fr, t)
     chrome(fr, t, total)
-    caption(fr, t)
     return finish(fr, t)
 
 
@@ -803,8 +699,8 @@ def build_audio(path_out):
     cm = int(.9 * sr)
     ct = np.arange(cm) / sr
     chime = ((np.sin(2 * np.pi * 1318.5 * ct) + .5 * np.sin(2 * np.pi * 1976 * ct) + .25 * np.sin(2 * np.pi * 2637 * ct)) * np.exp(-ct * 5)).astype(np.float32) * .045
-    for i in (1, 3, 6, 7, 10, 14, 18, 22, 25, 28, 30, 33, 34):
-        add(chime, PH[i][0])
+    for at in (.54, 3.14, 6.56, 10.02, 16.46, 19.66, 30.98, 42.54, 57.46, 70.62, 76.12, 82.04, 87.34, 94.32, 100.32):
+        add(chime, at)
     mix = np.clip(mix, -1, 1)
     with wave.open(path_out, "wb") as w:
         w.setnchannels(1)
